@@ -1,0 +1,81 @@
+import random
+import sys
+
+def display_grid(grid):
+    for row in grid:
+        print(" ".join(row))
+
+def create_puzzle(size):
+    numbers = list(range(1, size * size))
+    numbers.append(0)  # 0 represents the empty tile
+    random.shuffle(numbers)
+
+    grid = []
+    for i in range(size):
+        row = numbers[i * size:(i + 1) * size]
+        grid.append([str(num) if num != 0 else ' ' for num in row])
+
+    return grid
+
+def find_empty_tile(grid):
+    for i, row in enumerate(grid):
+        for j, value in enumerate(row):
+            if value == ' ':
+                return i, j
+
+    return None
+
+def is_solved(grid):
+    size = len(grid)
+    expected = 1
+
+    for i in range(size):
+        for j in range(size):
+            if i == size - 1 and j == size - 1:
+                return grid[i][j] == ' '
+
+            if grid[i][j] != str(expected):
+                return False
+
+            expected += 1
+
+    return True
+
+def move_tile(grid, direction):
+    size = len(grid)
+    empty_i, empty_j = find_empty_tile(grid)
+
+    if direction == 'up' and empty_i < size - 1:
+        grid[empty_i][empty_j], grid[empty_i + 1][empty_j] = grid[empty_i + 1][empty_j], grid[empty_i][empty_j]
+    elif direction == 'down' and empty_i > 0:
+        grid[empty_i][empty_j], grid[empty_i - 1][empty_j] = grid[empty_i - 1][empty_j], grid[empty_i][empty_j]
+    elif direction == 'left' and empty_j < size - 1:
+        grid[empty_i][empty_j], grid[empty_i][empty_j + 1] = grid[empty_i][empty_j + 1], grid[empty_i][empty_j]
+    elif direction == 'right' and empty_j > 0:
+        grid[empty_i][empty_j], grid[empty_i][empty_j - 1] = grid[empty_i][empty_j - 1], grid[empty_i][empty_j]
+    else:
+        print("Invalid move! Try again.")
+
+def play_game():
+    size = 4  # Grid size (4x4)
+    grid = create_puzzle(size)
+
+    print("Welcome to the Sliding Puzzle Game!")
+    print("Arrange the tiles in ascending order.")
+    print("Use 'up', 'down', 'left', 'right' to move the tiles.")
+
+    while not is_solved(grid):
+        display_grid(grid)
+        move = input("Your move: ").strip().lower()
+        move_tile(grid, move)
+
+    print("Congratulations! You solved the puzzle.")
+
+def main():
+    try:
+        play_game()
+    except KeyboardInterrupt:
+        print("\nGame exited. Goodbye!")
+
+if __name__ == "__main__":
+    main()
